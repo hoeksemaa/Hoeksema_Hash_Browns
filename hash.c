@@ -17,12 +17,21 @@ struct hash_node {
 };
 
 // internal helper functions
-// static size_t hash_function(const char* key, size_t capacity) {
-//	// TODO: implement hash_funciton
-//	(void)key;
-//	(void)capacity;
-//	return 0;
-// }
+static size_t hash_function(const char* key, size_t capacity) {
+
+	// implementing djb2 hash algorithm
+	size_t hash = 5381;
+	int c;
+
+	/* key is dereferenced for the char it points at
+	 * and then the char is assigned to c.
+	 * when c = '\0', the loop breaks. */
+	while ((c = *key++)) {
+		hash = ((hash << 5) + hash) + c; // hash * 33 + c
+	}
+
+	return hash % capacity;
+}
 
 // static void resize_table(hash_table_t* table) {
 //	// TODO: implement resize_table
