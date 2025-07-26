@@ -58,8 +58,14 @@ hash_table_t* hash_create(size_t initial_capacity) {
 }
 
 void hash_destroy(hash_table_t* table) {
-	// TODO: implement hash_destroy
-	(void)table;
+	if (table == NULL) {
+		return; // nothing to destroy
+	}
+
+	// TODO: free all nodes in all buckets
+
+	free(table->buckets);
+	free(table);
 }
 
 bool hash_insert(hash_table_t* table, const char* key, void* value) {
@@ -85,7 +91,8 @@ bool hash_delete(hash_table_t* table, const char* key) {
 }
 
 size_t hash_size(const hash_table_t* table) {
-	// TODO: implement hash_size
-	(void)table;
-	return 0;
+	if (table == NULL) {
+		return 0;
+	}
+	return table->size;
 }
