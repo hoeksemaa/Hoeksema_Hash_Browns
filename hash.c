@@ -17,7 +17,7 @@ struct hash_node {
 };
 
 // internal helper functions
-static size_t hash_function(const char* key, size_t capacity) {
+static size_t hash_function(const char* key) {
 
 	// implementing djb2 hash algorithm
 	size_t hash = 5381;
@@ -30,7 +30,7 @@ static size_t hash_function(const char* key, size_t capacity) {
 		hash = ((hash << 5) + hash) + c; // hash * 33 + c
 	}
 
-	return hash % capacity;
+	return hash;
 }
 
 // static void resize_table(hash_table_t* table) {
@@ -78,7 +78,22 @@ void hash_destroy(hash_table_t* table) {
 }
 
 bool hash_insert(hash_table_t* table, const char* key, void* value) {
-	// TODO: implement hash_insert
+	
+	// 1. hash key and find bucket
+	size_t hash = hash_function(key);
+	size_t bucket_idx = hash % table->capacity;
+
+	// 2. get the head of the linked list at this bucket
+	node_t* head = table->buckets[bucket_idx];
+
+	// 3. check if key already exists
+	
+	// 4. if key doesn't exist, create node
+	
+	// 5. add new node to bucket's linked list (chaining solution to collisions)
+
+	// 6. check if resize is needed
+
 	(void)table;
 	(void)key;
 	(void)value;
