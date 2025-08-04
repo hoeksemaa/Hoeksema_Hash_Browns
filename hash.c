@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "hash.h"
 #include <stdlib.h>
 #include <stdbool.h>
@@ -33,7 +35,7 @@ static size_t hash_function(const char* key) {
 	return hash;
 }
 
-static hash_node_t* create_node(const char* key, const void* value, hash_node_t* next) {
+static hash_node_t* create_node(const char* key, void* value, hash_node_t* next) {
 	
 	// allocate for the node
 	hash_node_t* node = malloc(sizeof(hash_node_t));
@@ -60,15 +62,19 @@ static hash_node_t* create_node(const char* key, const void* value, hash_node_t*
 
 // public functions
 hash_table_t* hash_create(size_t initial_capacity) {
+	// we do a little input validation
+	if (initial_capacity == 0) return NULL;
+
 	// allocate memory for hash table struct itself
 	hash_table_t* table = malloc(sizeof(hash_table_t));
-	if (table == NULL) {
+	if (!table) {
 		return NULL; // malloc failed
 	}
 
 	// allocate memory for the bucket array
-	table->buckets = malloc(initial_capacity * sizeof(struct hash_node*));
-	if (table->buckets == NULL) {
+	// calloc zeros the memory
+	table->buckets = calloc(initial_capacity, sizeof(hash_node_t*));
+	if (!table->buckets) {
 		free(table); // clean up if second malloc fails
 		return NULL;
 	}
@@ -78,16 +84,11 @@ hash_table_t* hash_create(size_t initial_capacity) {
 	table->size = 0;
 	table->load_factor_threshold = 0.75;
 
-	// initialize buckets to empty
-	for (size_t i = 0; i < initial_capacity; i++) {
-		table->buckets[i] = NULL;
-	}
-
 	return table;
 }
 
 void hash_destroy(hash_table_t* table) {
-	if (table == NULL) {
+	if (!table) {
 		return; // nothing to destroy
 	}
 
@@ -109,7 +110,7 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 	hash_node_t* current = table->buckets[bucket_index];
 
 	// 3. traverse chain to check if key already exists
-	while (current != NULL) {
+	while (current) {
 
 		// key exists; update value
 		// no need for incrementing size or resizing
@@ -152,8 +153,8 @@ bool hash_delete(hash_table_t* table, const char* key) {
 }
 
 size_t hash_size(const hash_table_t* table) {
-	if (table == NULL) {
-		return 0;
+	if (!table) {
+		return 0; // invalid table
 	}
 	return table->size;
 }
