@@ -33,6 +33,26 @@ static size_t hash_function(const char* key) {
 	return hash;
 }
 
+static hash_node_t* create_node(const char* key, const void* value, hash_node_t* next) {
+	
+	// allocate for the node
+	hash_node_t* node = malloc(sizeof(hash_node_t));
+	if (!node) return NULL; 
+
+	// allocate for the key string
+	node->key = strdup(key);
+	if (!node->key) {
+		free(node);
+		return NULL;
+	}
+
+	// copy but don't allocate for the value
+	// the caller could pass us a pointer to data; we don't care what the data is or whether it changes
+	node->value = value;
+	node->next = next;
+	return node;
+}
+
 // static void resize_table(hash_table_t* table) {
 //	// TODO: implement resize_table
 //	(void)table;
@@ -78,26 +98,43 @@ void hash_destroy(hash_table_t* table) {
 }
 
 bool hash_insert(hash_table_t* table, const char* key, void* value) {
-	
+	// we do a little defensive programming
+	if (!table || !key) return false;
+
 	// 1. hash key and find bucket
-	size_t hash = hash_function(key);
-	size_t bucket_idx = hash % table->capacity;
+	size_t hash_value = hash_function(key);
+	size_t bucket_index = hash_value % table->capacity;
 
 	// 2. get the head of the linked list at this bucket
-	node_t* head = table->buckets[bucket_idx];
+	hash_node_t* current = table->buckets[bucket_index];
 
-	// 3. check if key already exists
-	
-	// 4. if key doesn't exist, create node
-	
-	// 5. add new node to bucket's linked list (chaining solution to collisions)
+	// 3. traverse chain to check if key already exists
+	while (current != NULL) {
 
-	// 6. check if resize is needed
+		// key exists; update value
+		// no need for incrementing size or resizing
+		if (strcmp(current->key, key) == 0) {
+			current->value = value;
+			return true;
+		}
+		current = current->next;
+	}
 
-	(void)table;
-	(void)key;
-	(void)value;
-	return false;
+	// 4. key doesn't exist; add new node
+	hash_node_t* node = create_node(key, value, table->buckets[bucket_index]);
+	if (!node) return false;
+	table->buckets[bucket_index] = node;
+
+	// 5. increment size
+	table->size++;
+
+	// 6. perform resize if necessary
+	if (table->size > table->capacity * table->load_factor_threshold) {
+		// TODO: insert resize function
+		// resize_table(table);
+	}
+
+	return true;
 }
 
 void* hash_get(const hash_table_t* table, const char* key) {

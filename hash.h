@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 typedef struct hash_table hash_table_t;
+typedef struct hash_node hash_node_t;
 
 hash_table_t* hash_create(size_t initial_capacity);
 void hash_destroy(hash_table_t* table);
