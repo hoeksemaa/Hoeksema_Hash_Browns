@@ -72,7 +72,7 @@ hash_table_t* hash_create(size_t initial_capacity) {
 	}
 
 	// allocate memory for the bucket array
-	// calloc zeros the memory
+	// calloc zeros the memory, so no initialization required
 	table->buckets = calloc(initial_capacity, sizeof(hash_node_t*));
 	if (!table->buckets) {
 		free(table); // clean up if second malloc fails
@@ -92,7 +92,15 @@ void hash_destroy(hash_table_t* table) {
 		return; // nothing to destroy
 	}
 
-	// TODO: free all nodes in all buckets
+	for (size_t i = 0; i < table->capacity; i++) {
+		hash_node_t* current = table->buckets[i];
+		while (current) {
+			hash_node_t* next = current->next;
+			free(current->key);
+			free(current);
+			current = next;
+		}
+	}
 
 	free(table->buckets);
 	free(table);
