@@ -55,10 +55,31 @@ static hash_node_t* create_node(const char* key, void* value, hash_node_t* next)
 	return node;
 }
 
-// static void resize_table(hash_table_t* table) {
-//	// TODO: implement resize_table
-//	(void)table;
-// }
+static bool resize_table(hash_table_t* table) {
+	
+	// save old table values
+	hash_node_t** old_buckets = table->buckets;
+	size_t old_capacity = table->capacity;
+	
+	// reassign table buckets
+	table->buckets = calloc(old_capacity * 2, sizeof(hash_node_t*));
+	table->capacity = 
+
+	for (size_t i; i < old_capacity; i++) {
+		hash_node_t* current = old_buckets[i];
+		while (current) {
+			size_t hash_value = 
+		}
+	}
+
+	table
+	free(old_buckets);
+	
+	return true;
+
+	// TODO: implement resize_table
+	(void)table;
+}
 
 // public functions
 hash_table_t* hash_create(size_t initial_capacity) {
