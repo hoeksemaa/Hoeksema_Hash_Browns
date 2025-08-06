@@ -57,28 +57,41 @@ static hash_node_t* create_node(const char* key, void* value, hash_node_t* next)
 
 static bool resize_table(hash_table_t* table) {
 	
-	// save old table values
+	// save old values
 	hash_node_t** old_buckets = table->buckets;
 	size_t old_capacity = table->capacity;
-	
-	// reassign table buckets
-	table->buckets = calloc(old_capacity * 2, sizeof(hash_node_t*));
-	table->capacity = 
 
-	for (size_t i; i < old_capacity; i++) {
+	// resize capacity and buckets
+	table->buckets = calloc(table->capacity * 2, sizeof(hash_node_t*));
+	if (!table->buckets) return false;
+	table->capacity = table->capacity * 2;
+
+	// rehash all existing nodes
+	for (size_t i = 0; i < old_capacity; i++) {
+
+		// for all nodes in the current bucket...
 		hash_node_t* current = old_buckets[i];
 		while (current) {
-			size_t hash_value = 
+
+			// 1. save next node
+			hash_node_t* next = current->next;
+
+			// 2. rehash node
+			size_t hash_value = hash_function(current->key);
+			size_t bucket_index = hash_value % table->capacity;
+
+			// 3. reassigning pointers
+			current->next = table->buckets[bucket_index];
+			table->buckets[bucket_index] = current;
+
+			// 4. go to next node
+			current = next;
 		}
 	}
-
-	table
-	free(old_buckets);
 	
-	return true;
+	free(old_buckets);
 
-	// TODO: implement resize_table
-	(void)table;
+	return true;
 }
 
 // public functions
@@ -159,10 +172,12 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 	table->size++;
 
 	// 6. perform resize if necessary
+	bool resize_success = true;
 	if (table->size > table->capacity * table->load_factor_threshold) {
-		// TODO: insert resize function
-		// resize_table(table);
+		resize_success = resize_table(table);
 	}
+
+	if (!resize_success) return false;
 
 	return true;
 }
