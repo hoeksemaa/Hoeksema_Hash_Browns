@@ -144,14 +144,20 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 	// we do a little defensive programming
 	if (!table || !key) return false;
 
-	// 1. hash key and find bucket
+	// 1. perform resize if necessary
+	if (table->size > table->capacity * table->load_factor_threshold) {
+		bool resize_success = resize_table(table);
+		if (!resize_success) return false;
+	}
+
+	// 2. hash key and find bucket
 	size_t hash_value = hash_function(key);
 	size_t bucket_index = hash_value % table->capacity;
 
-	// 2. get the head of the linked list at this bucket
+	// 3. get the head of the linked list at this bucket
 	hash_node_t* current = table->buckets[bucket_index];
 
-	// 3. traverse chain to check if key already exists
+	// 4. traverse chain to check if key already exists
 	while (current) {
 
 		// key exists; update value
@@ -163,20 +169,13 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 		current = current->next;
 	}
 
-	// 4. key doesn't exist; add new node
+	// 5. key doesn't exist; create new node
 	hash_node_t* node = create_node(key, value, table->buckets[bucket_index]);
 	if (!node) return false;
 	table->buckets[bucket_index] = node;
 
-	// 5. increment size
+	// 6. increment size
 	table->size++;
-
-	// 6. perform resize if necessary
-	bool resize_success;
-	if (table->size > table->capacity * table->load_factor_threshold) {
-		resize_success = resize_table(table);
-		if (!resize_success) return false;			
-	}
 
 	return true;
 }
