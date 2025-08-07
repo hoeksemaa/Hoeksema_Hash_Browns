@@ -172,12 +172,11 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 	table->size++;
 
 	// 6. perform resize if necessary
-	bool resize_success = true;
+	bool resize_success;
 	if (table->size > table->capacity * table->load_factor_threshold) {
 		resize_success = resize_table(table);
+		if (!resize_success) return false;			
 	}
-
-	if (!resize_success) return false;
 
 	return true;
 }
