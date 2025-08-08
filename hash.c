@@ -8,7 +8,7 @@
 struct hash_table {
 	struct hash_node** buckets;
 	size_t capacity;
-	size_t size;d
+	size_t size;
 	double load_factor_threshold;
 };
 
@@ -212,6 +212,25 @@ bool hash_delete(hash_table_t* table, const char* key) {
 	} else return false;
 
 	// 3. traverse chain for key match
+	hash_node_t* previous = current;
+	current = current->next;
+	while (current) {
+		// check for match
+		if (strcmp(current->key, key) == 0) {
+			// reassign pointers
+			previous->next = current->next;
+
+			// free node
+			free(current->key);
+			free(current);
+
+			return true;
+		}
+
+		// update previous and current
+		previous = current;
+		current = current->next;
+	}
 
 	return false;
 }
