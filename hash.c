@@ -145,7 +145,7 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 	if (!table || !key) return false;
 
 	// 1. perform resize if necessary
-	if (table->size > table->capacity * table->load_factor_threshold) {
+	if (table->size >= table->capacity * table->load_factor_threshold) {
 		bool resize_success = resize_table(table);
 		if (!resize_success) return false;
 	}
