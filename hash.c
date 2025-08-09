@@ -184,14 +184,13 @@ void* hash_get(const hash_table_t* table, const char* key) {
 	// we do a little defensive programming
 	if (!table || !key) return NULL;
 	
-	// 1. get key hash
+	// get key hash
 	size_t hash_value = hash_function(key);
 	size_t bucket_index = hash_value % table->capacity;
 
-	// 2. check for match
 	hash_node_t* current = table->buckets[bucket_index];
 	while (current) {
-		if (strcmp(current->key, key) == 0){
+		if (strcmp(current->key, key) == 0) {
 			return current->value;
 		}
 		current = current->next;
@@ -214,14 +213,9 @@ bool hash_delete(hash_table_t* table, const char* key) {
 
 	// check for match
 	if (strcmp(current->key, key) == 0) {
-		// reassign pointers
 		table->buckets[bucket_index] = current->next;
-			
-		// free node
 		free(current->key);
 		free(current);
-
-		// decrease size
 		table->size--;
 
 		return true;
@@ -233,14 +227,9 @@ bool hash_delete(hash_table_t* table, const char* key) {
 	while (current) {
 		// check for match
 		if (strcmp(current->key, key) == 0) {
-			// reassign pointers
 			previous->next = current->next;
-
-			// free node
 			free(current->key);
 			free(current);
-
-			// decrease size
 			table->size--;
 	
 			return true;
