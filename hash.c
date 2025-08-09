@@ -181,9 +181,22 @@ bool hash_insert(hash_table_t* table, const char* key, void* value) {
 }
 
 void* hash_get(const hash_table_t* table, const char* key) {
-	// TODO: implement hash_get
-	(void)table;
-	(void)key;
+	// we do a little defensive programming
+	if (!table || !key) return NULL;
+	
+	// 1. get key hash
+	size_t hash_value = hash_function(key);
+	size_t bucket_index = hash_value % table->capacity;
+
+	// 2. check for match
+	hash_node_t* current = table->buckets[bucket_index];
+	while (current) {
+		if (strcmp(current->key, key) == 0){
+			return current->value;
+		}
+		current = current->next;
+	}	
+
 	return NULL;
 }
 
