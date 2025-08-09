@@ -210,19 +210,22 @@ bool hash_delete(hash_table_t* table, const char* key) {
 	
 	// 2. special case: key matches bucket head
 	hash_node_t* current = table->buckets[bucket_index];
-	if (current) {
-		// check for match
-		if (strcmp(current->key, key) == 0) {
-			// reassign pointers
-			table->buckets[bucket_index] = current->next;
-			
-			// free node
-			free(current->key);
-			free(current);
+	if (!current) return false;
 
-			return true;
-		}
-	} else return false;
+	// check for match
+	if (strcmp(current->key, key) == 0) {
+		// reassign pointers
+		table->buckets[bucket_index] = current->next;
+			
+		// free node
+		free(current->key);
+		free(current);
+
+		// decrease size
+		table->size--;
+
+		return true;
+	}
 
 	// 3. traverse chain for key match
 	hash_node_t* previous = current;
@@ -237,6 +240,9 @@ bool hash_delete(hash_table_t* table, const char* key) {
 			free(current->key);
 			free(current);
 
+			// decrease size
+			table->size--;
+	
 			return true;
 		}
 
