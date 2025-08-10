@@ -11,12 +11,25 @@ void test_create_size_destroy();
 void test_insert_and_retrieve();
 void test_delete();
 void test_resize();
+void test_duplicate_key();
+void test_duplicate_keys();
+void test_get_nonexistent_key();
+void test_delete_nonexistent_key();
+void test_insert_null_key();
+void test_insert_empty_key();
 
 int main() {
 	test_create_size_destroy();
 	test_insert_and_retrieve();
 	test_delete();
 	test_resize();
+
+	// edge cases
+	test_duplicate_keys();
+	test_get_nonexistent_key();
+	test_delete_nonexistent_key();
+	test_insert_null_key();
+	test_insert_empty_key();
 	return 0;
 }
 
@@ -124,4 +137,94 @@ void test_resize() {
 	TEST("table size == 5", size == 5);
 		
 	hash_destroy(table);
-}	
+}
+
+void test_duplicate_keys() {
+	
+	printf("\nDUPLICATE KEYS TEST\n");
+
+	size_t size;
+	bool insert_success;
+	void* retrieve_success;
+
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
+
+	// insert same key three times
+	insert_success = hash_insert(table, "1", "cat");
+	TEST("hash_insert() success for '1':'cat'", insert_success);
+	insert_success = hash_insert(table, "1", "cat");
+	TEST("hash_insert() success for '1':'cat'", insert_success);
+	insert_success = hash_insert(table, "1", "dog");
+	TEST("hash_insert() success for '1':'dog'", insert_success);
+
+	size = hash_size(table);
+	TEST("table size == 1", size == 1);
+
+	retrieve_success = hash_get(table, "1");
+	TEST("hash_get() value = 'dog'", strcmp((char*)retrieve_success, "dog") == 0);
+
+	hash_destroy(table);
+}
+
+void test_get_nonexistent_key() {
+	
+	printf("\nGET NONEXISTENT KEY TEST\n");
+
+	void* retrieve_success;
+
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
+
+	retrieve_success = hash_get(table, "1");
+	TEST("hash_get() returns NULL", !retrieve_success);
+
+	hash_destroy(table);
+}
+
+void test_delete_nonexistent_key() {
+
+	printf("\nDELETE NONEXISTENT KEY TEST\n");
+
+	bool delete_success;
+
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
+
+	delete_success = hash_delete(table, "1");	
+	TEST("hash_delete() return false", !delete_success);
+
+	hash_destroy(table);
+}
+
+void test_insert_null_key() {
+
+	printf("\nINSERT NULL KEY TEST\n");
+
+	bool insert_success;
+
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
+
+	char* key = NULL;
+	insert_success = hash_insert(table, key, "cat");
+	TEST("hash_insert() returns false", !insert_success);
+
+	hash_destroy(table);
+}
+
+void test_insert_empty_key() {
+
+	printf("\nINSERT EMPTY KEY TEST\n");
+
+	bool insert_success;
+
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
+
+	insert_success = hash_insert(table, "", "cat");
+	TEST("hash_insert() returns true", insert_success);
+
+	hash_destroy(table);
+}
+
