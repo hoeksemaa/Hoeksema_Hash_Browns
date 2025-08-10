@@ -1,13 +1,18 @@
 #include "hash.h"
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 void test_create_size_destroy();
 void test_insert();
+void test_delete();
+void test_get();
 
 int main() {
 	test_create_size_destroy();
 	test_insert();
+	test_delete();
+	test_get();
 	return 0;
 }
 
@@ -78,6 +83,61 @@ void test_insert() {
 	assert(size == 6);
 
 	printf("✓ hash_insert() works\n");
+
+	(void)insert_success;
+}
+
+void test_delete() {
+
+	// create table
+	printf("Creating hash_table with 2 keys inserted...\n");
+	hash_table_t* table = hash_create(4);
+	char* key = "1";
+	void* value = "dog";
+	bool insert_success;
+	bool delete_success;
+
+	insert_success = hash_insert(table, key, value);
+	key = "2";
+	insert_success = hash_insert(table, key, value);
+	size_t size = hash_size(table);
+	assert(size == 2);
+	printf("✓ created table of size 2.\n");
+
+	// delete object
+	printf("Deleting key = 1 from table\n");
+	delete_success = hash_delete(table, "1");
+	size = hash_size(table);
+	assert(size == 1);
+	printf("✓ hash_delete() works\n");
+
+	(void)insert_success;
+	(void)delete_success;
+}
+
+void test_get() {
+	
+	// create table
+	printf("Creating table of with 2 keys inserted...\n");
+	hash_table_t* table = hash_create(4);
+	char* key = "1";
+	void* value = "cat";
+	bool insert_success;
+
+	insert_success = hash_insert(table, key, value);
+	key = "2";
+	insert_success = hash_insert(table, key, value);
+	size_t size = hash_size(table);
+	assert(size == 2);
+	printf("✓ created table of size 2.\n");
+
+	// get object
+	printf("Preparing to hash_get()...\n");
+	void* retrieved = hash_get(table, key);
+	assert(strcmp((char*)retrieved, "cat") == 0);
+	//printf(value_gotten);
+	//printf("\n");
+	printf("✓ hash_get() works\n");
 
 	(void)insert_success;
 }
