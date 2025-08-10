@@ -4,29 +4,34 @@
 #include <string.h>
 
 #define TEST(name, condition) \
-	printf("[%s] Testing %s.\n", (condition) ? "PASS" : "FAIL", name)
+	printf("[%s] Testing %s\n", (condition) ? "PASS" : "FAIL", name)
+#define TABLE_CAPACITY 4
 
 void test_create_size_destroy();
-void test_insert();
+void test_insert_and_retrieve();
 void test_delete();
-void test_get();
+void test_resize();
 
 int main() {
 	test_create_size_destroy();
-	test_insert();
+	test_insert_and_retrieve();
 	test_delete();
-	test_get();
+	test_resize();
 	return 0;
 }
 
 void test_create_size_destroy() {
-	
+
+	printf("\nCREATE, SIZE, DESTROY TEST\n");	
+
+	size_t size;
+
 	// table creation
-	hash_table_t* table = hash_create(16);
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
 	TEST("hash_create()", table != NULL);
 	
 	// table size
-	size_t size = hash_size(table);
+	size = hash_size(table);
 	TEST("hash_size()", size == 0);
 	
 	// table destroy
@@ -34,88 +39,89 @@ void test_create_size_destroy() {
 	TEST("hash_destroy() doesn't crash", true);	
 }
 
-void test_insert() {
-	
-	// creating table
-	hash_table_t* table = hash_create(4);
-	size_t size = hash_size(table);
-	char* key = "1";
-	void* value = "dog";
+void test_insert_and_retrieve() {
+
+	printf("\nINSERT AND RETRIEVE TEST\n");
+
+	size_t size;
 	bool insert_success;
-	TEST("hash_create() of capacity 4", size == 0);
+	void* retrieve_success;
 
-	// inserting +1
-	insert_success = hash_insert(table, key, value);
-	size = hash_size(table);
-	TEST("hash_insert() 1x", size == 1);
+	// creating table
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
 
-	// inserting +2
-	key = "2";
-	insert_success = hash_insert(table, key, value);
+	// insert
+	insert_success = hash_insert(table, "1", "cat");
+	TEST("hash_insert() success for '1':'cat'", insert_success);
 	size = hash_size(table);
-	TEST("hash_insert() 2x", size == 2);
-	
-	// inserting +3
-	key = "3";
-	insert_success = hash_insert(table, key, value);
-	size = hash_size(table);
-	TEST("hash_insert() 3x (should trigger resize)", size == 3);
+	TEST("table size", size == 1);
 
-	// inserting +4, 5, 6 (should trigger resize; also more nodes than buckets)
-	key = "4";
-	insert_success = hash_insert(table, key, value);
-	key = "5";
-	insert_success = hash_insert(table, key, value);
-	key = "6";
-	insert_success = hash_insert(table, key, value);
-	size = hash_size(table);
-	TEST("hash_insert() 6x (should trigger second resize)", size == 6);
+	// retrieve
+	retrieve_success = hash_get(table, "1");
+	TEST("hash_get() success for key: '1'", retrieve_success);
+	TEST("hash_get() value = 'cat'", strcmp((char*)retrieve_success, "cat") == 0);
 
-	(void)insert_success;
+	hash_destroy(table);
 }
 
 void test_delete() {
 
-	// create table
-	hash_table_t* table = hash_create(4);
-	char* key = "1";
-	void* value = "dog";
+	printf("\nOBJECT DELETE TEST\n");
+
 	bool insert_success;
 	bool delete_success;
 
-	insert_success = hash_insert(table, key, value);
-	key = "2";
-	insert_success = hash_insert(table, key, value);
+	// create table
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create()", table != NULL);
+
+	insert_success = hash_insert(table, "1", "cat");
+	TEST("hash_insert() success", insert_success);
+	insert_success = hash_insert(table, "2", "dog");
+	TEST("hash_insert() success", insert_success);
 	size_t size = hash_size(table);
-	TEST("hash_create() of capacity 4", size == 2);
+	TEST("table of size 2", size == 2);
 
 	// delete object
 	delete_success = hash_delete(table, "1");
+	TEST("hash_delete() success", delete_success);
 	size = hash_size(table);
-	TEST("hash_delete()", size == 1);
-	assert(size == 1);
+	TEST("table of size 1", size == 1);
 
-	(void)insert_success;
-	(void)delete_success;
+	hash_destroy(table);
 }
 
-void test_get() {
-	
-	// create table
-	hash_table_t* table = hash_create(4);
-	char* key = "1";
-	void* value = "cat";
+void test_resize() {
+
+	printf("\nTABLE RESIZE TEST\n");
+
 	bool insert_success;
+	size_t size;
 
-	insert_success = hash_insert(table, key, value);
-	key = "2";
-	insert_success = hash_insert(table, key, value);
-	size_t size = hash_size(table);
-	assert(size == 2);
+	// create table
+	hash_table_t* table = hash_create(TABLE_CAPACITY);
+	TEST("hash_create() with table capacity 4", table != NULL);
+	
+	// one insert
+	insert_success = hash_insert(table, "1", "cat");
+	TEST("hash_insert() success", insert_success);
+	size = hash_size(table);
+	TEST("table size == 1", size == 1);
 
-	// get object
-	void* retrieved = hash_get(table, key);
-	TEST("hash_get()", strcmp((char*)retrieved, "cat") == 0);
+	// four more inserts
+	insert_success = hash_insert(table, "2", "dog");
+	TEST("hash_insert() success", insert_success);
+	insert_success = hash_insert(table, "3", "rat");
+	TEST("hash_insert() success", insert_success);
+	insert_success = hash_insert(table, "4", "snake");
+	TEST("hash_insert() success", insert_success);
+	insert_success = hash_insert(table, "5", "bird");
+	TEST("hash_insert() success", insert_success);
 
-	(void)insert_success;
-}
+	// check final size
+	size = hash_size(table);
+	TEST("table size == 5", size == 5);
+		
+	hash_destroy(table);
+}	
