@@ -3,8 +3,19 @@
 #include <assert.h>
 #include <string.h>
 
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_RESET   "\x1b[0m"
 #define TEST(name, condition) \
-	printf("[%s] Testing %s\n", (condition) ? "PASS" : "FAIL", name)
+	do { \
+		if (condition) { \
+			printf(COLOR_GREEN "[PASS]" COLOR_RESET " %s\n", name); \
+		} else { \
+			printf(COLOR_RED "[FAIL]" COLOR_RESET " %s\n", name); \
+		} \
+	} while(0)
+#define TITLE(text) \
+	printf(" > %s\n", text)
 #define TABLE_CAPACITY 4
 
 void test_create_size_destroy();
@@ -19,6 +30,8 @@ void test_insert_null_key();
 void test_insert_empty_key();
 
 int main() {
+	
+	// core tests	
 	test_create_size_destroy();
 	test_insert_and_retrieve();
 	test_delete();
@@ -35,7 +48,7 @@ int main() {
 
 void test_create_size_destroy() {
 
-	printf("\nCREATE, SIZE, DESTROY TEST\n");	
+	TITLE("CREATE, SIZE, DESTROY TEST");	
 
 	size_t size;
 
@@ -54,7 +67,7 @@ void test_create_size_destroy() {
 
 void test_insert_and_retrieve() {
 
-	printf("\nINSERT AND RETRIEVE TEST\n");
+	TITLE("INSERT AND RETRIEVE TEST");
 
 	size_t size;
 	bool insert_success;
@@ -80,8 +93,8 @@ void test_insert_and_retrieve() {
 
 void test_delete() {
 
-	printf("\nOBJECT DELETE TEST\n");
-
+	TITLE("OBJECT DELETE TEST");
+	
 	bool insert_success;
 	bool delete_success;
 
@@ -107,8 +120,8 @@ void test_delete() {
 
 void test_resize() {
 
-	printf("\nTABLE RESIZE TEST\n");
-
+	TITLE("TABLE RESIZE TEST");
+	
 	bool insert_success;
 	size_t size;
 
@@ -141,8 +154,8 @@ void test_resize() {
 
 void test_duplicate_keys() {
 	
-	printf("\nDUPLICATE KEYS TEST\n");
-
+	TITLE("DUPLICATE KEYS TEST");
+	
 	size_t size;
 	bool insert_success;
 	void* retrieve_success;
@@ -169,8 +182,8 @@ void test_duplicate_keys() {
 
 void test_get_nonexistent_key() {
 	
-	printf("\nGET NONEXISTENT KEY TEST\n");
-
+	TITLE("GET NONEXISTENT KEY TEST");
+	
 	void* retrieve_success;
 
 	hash_table_t* table = hash_create(TABLE_CAPACITY);
@@ -184,8 +197,8 @@ void test_get_nonexistent_key() {
 
 void test_delete_nonexistent_key() {
 
-	printf("\nDELETE NONEXISTENT KEY TEST\n");
-
+	TITLE("DELETE NONEXISTENT KEY TEST");
+	
 	bool delete_success;
 
 	hash_table_t* table = hash_create(TABLE_CAPACITY);
@@ -199,8 +212,8 @@ void test_delete_nonexistent_key() {
 
 void test_insert_null_key() {
 
-	printf("\nINSERT NULL KEY TEST\n");
-
+	TITLE("INSERT NULL KEY TEST");
+	
 	bool insert_success;
 
 	hash_table_t* table = hash_create(TABLE_CAPACITY);
@@ -215,8 +228,8 @@ void test_insert_null_key() {
 
 void test_insert_empty_key() {
 
-	printf("\nINSERT EMPTY KEY TEST\n");
-
+	TITLE("INSERT EMPTY KEY TEST");
+	
 	bool insert_success;
 
 	hash_table_t* table = hash_create(TABLE_CAPACITY);
