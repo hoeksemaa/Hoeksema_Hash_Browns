@@ -1,8 +1,16 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g
+TARGETS = test stress_test
 
-test: test.c hash.c hash.h
-	$(CC) $(CFLAGS) -o test test.c hash.c
+all: $(TARGETS)
+
+test: test.c hash.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+stress_test: stress_test.c hash.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f test
+	rm -f $(TARGETS)
+
+.PHONY: all clean
