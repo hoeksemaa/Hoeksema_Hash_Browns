@@ -1,6 +1,5 @@
 #include "hash.h"
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 
 #define COLOR_RED     "\x1b[31m"
@@ -205,7 +204,7 @@ void test_delete_nonexistent_key() {
 	TEST("hash_create()", table != NULL);
 
 	delete_success = hash_delete(table, "1");	
-	TEST("hash_delete() return false", !delete_success);
+	TEST("hash_delete() returns false", !delete_success);
 
 	hash_destroy(table);
 }
