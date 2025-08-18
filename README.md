@@ -3,6 +3,7 @@
 - [Hash Map](#hash-map)
 - [Stress Test](#stress-test)
 - [Installation](#installation)
+- [Usage](#usage)
 
 # Hash Map
 The following data structures are available by using the hash.h file:
@@ -35,3 +36,13 @@ Execute unit tests:
 
 Execute stress test:
 ```./stress_test```
+
+# Usage
+```c
+#include  "hash.h"
+
+hash_table_t table = hash_create(16);
+hash_insert(table, "favorite_drink", "Waterloo");
+char* value = (char*)hash_get(table, "favorite_drink");
+hash_destroy(table);
+```
