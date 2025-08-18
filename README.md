@@ -39,7 +39,7 @@ Execute stress test:
 
 # Usage
 ```c
-#include  "hash.h"
+#include "hash.h"
 
 hash_table_t table = hash_create(16);
 hash_insert(table, "favorite_drink", "Waterloo");
