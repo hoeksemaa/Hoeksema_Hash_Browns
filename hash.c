@@ -12,11 +12,11 @@ struct hash_table {
 	double load_factor_threshold;
 };
 
-struct hash_node {
+typedef struct hash_node {
 	char* key;
 	void* value;
 	struct hash_node* next;
-};
+} hash_node_t;
 
 // internal helper functions
 static size_t hash_function(const char* key) {

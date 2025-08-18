@@ -7,7 +7,6 @@
 # Hash Map
 The following data structures are available by using the hash.h file:
 - hash_table
-- hash_node
 
 The following functions are available by using the hash.h file:
 - hash_create()
